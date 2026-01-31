@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('elements', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('symbol');
+            $table->string('category');
+            $table->string('form');
+            $table->decimal('purity', 5, 2);
+            $table->decimal('weight', 12, 2);
+            $table->decimal('radioactivityLevel', 12, 4);
+            $table->decimal('pricePerUnit', 10, 2);
+            $table->string('availabilityStatus');
+            $table->string('regulatoryClass');
+            $table->unsignedBigInteger('sourceId');
+            $table->foreignId('source_id');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('elements');
+    }
+};

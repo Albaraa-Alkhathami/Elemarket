@@ -1,0 +1,208 @@
+models:
+  Element:
+
+    name : string
+
+    symbol : string
+
+    category : string
+
+    form : string #(Ingot, Powder, Pellet, Ore)
+
+    purity : decimal:5,2 #(%)
+
+    weight : decimal:12,2 #(grams/kg)
+
+    radioactivityLevel : decimal:12,4 #(nullable, for non-radioactive metals)
+
+    pricePerUnit : decimal:10,2
+
+    availabilityStatus : string
+
+    regulatoryClass : string #(Unrestricted, Restricted, Government-only)
+
+    sourceId: unsignedBigInteger
+
+    relationships:
+
+      belongsTo : Source
+
+      belongsToMany : Order
+
+      hasMany: Inventory
+
+  Buyer:
+
+    fullName : string
+
+    email : string:unique
+
+    phone : string
+
+    buyerType : string #Individual, Company, Government
+
+    licenseNumber : string:nullable
+
+    verificationStatus : boolean:default(false)
+
+    shippingAddress : string
+
+    paymentMethods : string
+
+    relationships:
+
+      hasMany: Order
+
+      morphMany: Certification
+
+  Seller:
+
+    companyName: string
+
+    sellerType: string #(Mine, Refinery, Government, Reseller)
+
+    licenseNumber: string
+
+    verificationStatus: boolean:default(false)
+
+    rating: decimal:3,2:default(0)
+
+    warehouseLocations: string
+
+    relationships:
+
+    hasMany: Inventory, Order
+
+    morphMany: Certification
+
+  Source:
+
+    name: string
+
+    location: string
+
+    country: string
+
+    sourceType: string #(Mine, Reactor, Recycling Facility)
+
+    certification: string
+
+    extractionDate : dateTime
+
+    owner: string
+
+    relationships:
+
+      hasMany: Element
+
+  Order:
+
+    buyerId: unsignedBigInteger
+
+    sellerId: unsignedBigInteger
+
+    totalAmount: decimal:12,2
+
+    orderStatus: string:default('Pending')
+
+    createdAt: dateTime
+
+    approvedAt: dateTime:nullable
+
+    relationships:
+
+      belongsTo: Buyer, Seller
+
+      belongsToMany: Element
+
+      hasMany: Logistics
+
+  OrderElement:
+
+    orderId: unsignedBigInteger
+
+    elementId: unsignedBigInteger
+
+    quantity: unsignedBigInteger
+
+    pricePerUnitAtPurchase: decimal:10,2
+
+    subtotal: decimal:12,2
+
+    relationships:
+
+      belongsTo: Order, Element
+
+  Inventory:
+
+    sellerId: unsignedBigInteger
+
+    elementId: unsignedBigInteger
+
+    quantityAvailable: unsignedBigInteger
+
+    reservedQuantity: unsignedBigInteger
+
+    warehouseLocation: string
+
+    relationships:
+
+      belongsTo: Seller, Element
+
+  Certification:
+
+    licenseHolderId: unsignedBigInteger
+
+    licenseType: string #(Nuclear, Mining, Export)
+
+    issuedBy: string
+
+    validFrom: dateTime
+
+    validUntil: dateTime
+
+    status: string:default('Active')
+
+    relationships:
+
+      belongsTo: Buyer, Seller
+
+      morphTo: licenseHolder
+
+  Regulations:
+
+    elementCategory: string
+
+    requiredLicenseType: string
+
+    shippingRestrictions: string
+
+    storageRequirements: string
+
+    maxQuantityPerOrder: unsignedBigInteger:nullable
+
+  Logistics:
+
+    orderId: unsignedBigInteger
+
+    carrier: string
+
+    shippingMethod: string
+
+    trackingNumber: string:unique
+
+    hazardClass: string
+
+    deliveryStatus: string
+
+    estimatedDelivery: dateTime:nullable
+
+    actualDelivery: dateTime:nullable
+
+    relationships:
+
+      belongsTo: Order
+
+
+controllers:
+  # ...

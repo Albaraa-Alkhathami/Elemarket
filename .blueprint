@@ -1,0 +1,44 @@
+created:
+    - database/factories/ElementFactory.php
+    - database/factories/BuyerFactory.php
+    - database/factories/SellerFactory.php
+    - database/factories/SourceFactory.php
+    - database/factories/OrderFactory.php
+    - database/factories/OrderElementFactory.php
+    - database/factories/InventoryFactory.php
+    - database/factories/CertificationFactory.php
+    - database/factories/RegulationsFactory.php
+    - database/factories/LogisticsFactory.php
+    - database/migrations/2026_01_31_141513_create_elements_table.php
+    - database/migrations/2026_01_31_141514_create_buyers_table.php
+    - database/migrations/2026_01_31_141515_create_sellers_table.php
+    - database/migrations/2026_01_31_141516_create_sources_table.php
+    - database/migrations/2026_01_31_141517_create_orders_table.php
+    - database/migrations/2026_01_31_141518_create_order_elements_table.php
+    - database/migrations/2026_01_31_141519_create_inventories_table.php
+    - database/migrations/2026_01_31_141520_create_certifications_table.php
+    - database/migrations/2026_01_31_141521_create_regulations_table.php
+    - database/migrations/2026_01_31_141522_create_logistics_table.php
+    - database/migrations/2026_01_31_141523_create_element_order_table.php
+    - app/Models/Element.php
+    - app/Models/Buyer.php
+    - app/Models/Seller.php
+    - app/Models/Source.php
+    - app/Models/Order.php
+    - app/Models/OrderElement.php
+    - app/Models/Inventory.php
+    - app/Models/Certification.php
+    - app/Models/Regulations.php
+    - app/Models/Logistics.php
+models:
+    User: { name: string, email: string, email_verified_at: 'datetime nullable', password: string, remember_token: 'string nullable' }
+    Element: { name: string, symbol: string, category: string, form: string, purity: 'decimal:5,2', weight: 'decimal:12,2', radioactivityLevel: 'decimal:12,4', pricePerUnit: 'decimal:10,2', availabilityStatus: string, regulatoryClass: string, sourceId: unsignedBigInteger, relationships: { belongsTo: Source, belongsToMany: Order, hasMany: Inventory } }
+    Buyer: { fullName: string, email: 'string:unique', phone: string, buyerType: string, licenseNumber: 'string:nullable', verificationStatus: 'boolean:default(false)', shippingAddress: string, paymentMethods: string, relationships: { hasMany: Order, morphMany: Certification } }
+    Seller: { companyName: string, sellerType: string, licenseNumber: string, verificationStatus: 'boolean:default(false)', rating: 'decimal:3,2:default(0)', warehouseLocations: string, relationships: null, hasMany: 'Inventory, Order', morphMany: Certification }
+    Source: { name: string, location: string, country: string, sourceType: string, certification: string, extractionDate: dateTime, owner: string, relationships: { hasMany: Element } }
+    Order: { buyerId: unsignedBigInteger, sellerId: unsignedBigInteger, totalAmount: 'decimal:12,2', orderStatus: "string:default('Pending')", createdAt: dateTime, approvedAt: 'dateTime:nullable', relationships: { belongsTo: 'Buyer, Seller', belongsToMany: Element, hasMany: Logistics } }
+    OrderElement: { orderId: unsignedBigInteger, elementId: unsignedBigInteger, quantity: unsignedBigInteger, pricePerUnitAtPurchase: 'decimal:10,2', subtotal: 'decimal:12,2', relationships: { belongsTo: 'Order, Element' } }
+    Inventory: { sellerId: unsignedBigInteger, elementId: unsignedBigInteger, quantityAvailable: unsignedBigInteger, reservedQuantity: unsignedBigInteger, warehouseLocation: string, relationships: { belongsTo: 'Seller, Element' } }
+    Certification: { licenseHolderId: unsignedBigInteger, licenseType: string, issuedBy: string, validFrom: dateTime, validUntil: dateTime, status: "string:default('Active')", relationships: { belongsTo: 'Buyer, Seller', morphTo: licenseHolder } }
+    Regulations: { elementCategory: string, requiredLicenseType: string, shippingRestrictions: string, storageRequirements: string, maxQuantityPerOrder: 'unsignedBigInteger:nullable' }
+    Logistics: { orderId: unsignedBigInteger, carrier: string, shippingMethod: string, trackingNumber: 'string:unique', hazardClass: string, deliveryStatus: string, estimatedDelivery: 'dateTime:nullable', actualDelivery: 'dateTime:nullable', relationships: { belongsTo: Order } }
